@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import ConvexClientProvider from '@/components/providers/convex-provider';
+import { ClerkProvider } from '@clerk/nextjs';
+import { Navbar } from '@/components/navbar';
+import { AuthDialogs } from '@/components/auth/auth-dialogs';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -13,9 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Tour.js | Ship guided onboarding tours in minutes',
-  description:
-    'Embed a configurable, animated tour widget with analytics—built for modern web apps.',
+  title: 'OnboardJS',
+  description: 'Your onboarding platform',
 };
 
 export default function RootLayout({
@@ -101,7 +104,16 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} bg-gray-950 text-slate-300 selection:bg-cyan-500/30 selection:text-cyan-200`}
       >
-        {children}
+        <ClerkProvider
+          signInFallbackRedirectUrl="/"
+          signUpFallbackRedirectUrl="/"
+        >
+          <ConvexClientProvider>
+            <Navbar />
+            <AuthDialogs />
+            {children}
+          </ConvexClientProvider>
+        </ClerkProvider>
       </body>
     </html>
   );
