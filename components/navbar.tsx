@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { LogOut, User } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,7 @@ import { useAuth, useAuthDialogs } from '@/hooks/use-auth';
 export function Navbar() {
   const { user, isSignedIn, isLoaded, signOut } = useAuth();
   const { openLogin, openSignup } = useAuthDialogs();
+  const pathname = usePathname();
 
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
@@ -27,6 +29,10 @@ export function Navbar() {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  if (pathname !== '/') {
+    return <></>;
+  }
 
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">

@@ -35,3 +35,24 @@ export const create = mutation({
     return userId;
   },
 });
+
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error('Not authenticated');
+    }
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', identity.email!))
+      .first();
+
+    if (!user) {
+      throw new Error('User not found in database');
+    }
+
+    return user;
+  },
+});
