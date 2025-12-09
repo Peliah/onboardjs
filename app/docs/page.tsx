@@ -713,8 +713,8 @@ if (user) {
                     </span>
                   </summary>
                   <div className="text-sm text-slate-400 p-5 pt-0 leading-relaxed">
-                    Simply add more objects to the steps array. There's no hard
-                    limit on the number of steps.
+                    Simply add more objects to the steps array. There&apos;s no
+                    hard limit on the number of steps.
                   </div>
                 </details>
                 <details className="group bg-white/[0.02] border border-white/5 rounded-lg open:bg-white/[0.04] transition-colors">

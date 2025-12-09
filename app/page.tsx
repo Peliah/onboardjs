@@ -70,14 +70,17 @@ function tourReducer(state: TourState, action: TourAction): TourState {
   }
 }
 
-const page = () => {
+const Page = () => {
   const [state, dispatch] = useReducer(tourReducer, initialState);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false
+  );
   const canvasRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
     const handleChange = (e: MediaQueryListEvent) =>
       setPrefersReducedMotion(e.matches);
     mediaQuery.addEventListener('change', handleChange);
@@ -138,7 +141,7 @@ const page = () => {
     };
   };
 
-  const targetPos = getTargetPosition();
+  // const targetPos = getTargetPosition();
   return (
     <>
       {/* Mobile Menu State */}
@@ -645,27 +648,40 @@ const page = () => {
                     <span className="text-purple-400">import</span> {'{'}{' '}
                     <span className="text-yellow-200">TourWidget</span> {'}'}{' '}
                     <span className="text-purple-400">from</span>{' '}
-                    <span className="text-green-400">"@tour/sdk"</span>;{'\n'}
+                    <span className="text-green-400">
+                      &quot;@tour/sdk&quot;
+                    </span>
+                    ;{'\n'}
                     {'\n'}
                     <span className="text-yellow-200">TourWidget</span>.
                     <span className="text-blue-400">init</span>({'{'}
                     {'\n'} <span className="text-cyan-300">tourId</span>:{' '}
-                    <span className="text-green-400">"onboarding-v1"</span>,
-                    {'\n'} <span className="text-cyan-300">steps</span>: [{'\n'}{' '}
-                    {'{'}
+                    <span className="text-green-400">
+                      &quot;onboarding-v1&quot;
+                    </span>
+                    ,{'\n'} <span className="text-cyan-300">steps</span>: [
+                    {'\n'} {'{'}
                     {'\n'} <span className="text-cyan-300">target</span>:{' '}
-                    <span className="text-green-400">"#hero-cta"</span>,{'\n'}{' '}
-                    <span className="text-cyan-300">content</span>:{' '}
-                    <span className="text-green-400">"Start here!"</span>,{'\n'}{' '}
-                    <span className="text-cyan-300">placement</span>:{' '}
-                    <span className="text-green-400">"bottom"</span>
+                    <span className="text-green-400">
+                      &quot;#hero-cta&quot;
+                    </span>
+                    ,{'\n'} <span className="text-cyan-300">content</span>:{' '}
+                    <span className="text-green-400">
+                      &quot;Start here!&quot;
+                    </span>
+                    ,{'\n'} <span className="text-cyan-300">placement</span>:{' '}
+                    <span className="text-green-400">&quot;bottom&quot;</span>
                     {'\n'} {'}'},{'\n'} {'{'}
                     {'\n'} <span className="text-cyan-300">target</span>:{' '}
-                    <span className="text-green-400">"#dashboard"</span>,{'\n'}{' '}
-                    <span className="text-cyan-300">content</span>:{' '}
-                    <span className="text-green-400">"View stats."</span>,{'\n'}{' '}
-                    <span className="text-cyan-300">placement</span>:{' '}
-                    <span className="text-green-400">"right"</span>
+                    <span className="text-green-400">
+                      &quot;#dashboard&quot;
+                    </span>
+                    ,{'\n'} <span className="text-cyan-300">content</span>:{' '}
+                    <span className="text-green-400">
+                      &quot;View stats.&quot;
+                    </span>
+                    ,{'\n'} <span className="text-cyan-300">placement</span>:{' '}
+                    <span className="text-green-400">&quot;right&quot;</span>
                     {'\n'} {'}'}
                     {'\n'} ],
                     {'\n'} <span className="text-cyan-300">analytics</span>:{' '}
@@ -824,8 +840,8 @@ const page = () => {
             <div className="grid md:grid-cols-3 gap-8">
               <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
                 <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                  "We launched onboarding in a week and doubled our completion
-                  rate. The developer experience is unmatched."
+                  &quot;We launched onboarding in a week and doubled our
+                  completion rate. The developer experience is unmatched.&quot;
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-slate-700"></div>
@@ -841,8 +857,8 @@ const page = () => {
               </div>
               <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
                 <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                  "Analytics revealed friction points we didn't know existed.
-                  Activation climbed 18% in the first month."
+                  &quot;Analytics revealed friction points we didn&apos;t know
+                  existed. Activation climbed 18% in the first month.&quot;
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-slate-700"></div>
@@ -858,8 +874,8 @@ const page = () => {
               </div>
               <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
                 <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                  "Accessible by default. QA time dropped significantly because
-                  we didn't have to build custom focus traps."
+                  &quot;Accessible by default. QA time dropped significantly
+                  because we didn&apos;t have to build custom focus traps.&quot;
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-slate-700"></div>
