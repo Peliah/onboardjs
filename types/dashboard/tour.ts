@@ -1,11 +1,20 @@
 export interface Tour {
   id: number;
-  name: string;
-  description: string;
+  title: string;
+  desc: string;
   status: string;
-  steps: number;
-  created: string;
+  created?: string;
   views: number;
-  completions: number;
-  color: string;
+  completions?: number;
+  color?: string;
+}
+
+export interface StepData {
+  title: string;
+  description: string;
+  selector: string;
+  button_text?: string;
+  bg_color?: string;
+  text_color?: string;
+  highlight_color?: string;
 }
