@@ -3,7 +3,6 @@ import { create } from 'zustand';
 type AuthDialogType = 'login' | 'signup' | null;
 
 interface AuthStore {
-  // Dialog state
   activeDialog: AuthDialogType;
   openLogin: () => void;
   openSignup: () => void;

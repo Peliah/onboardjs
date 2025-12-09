@@ -1,6 +1,8 @@
 'use client';
 
 import { useUser, useSignIn, useSignUp, useClerk } from '@clerk/nextjs';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { useAuthStore } from '@/stores/auth-store';
 
 export function useAuth() {
@@ -45,6 +47,7 @@ export function useEmailAuth() {
     setActive: setSignUpActive,
   } = useSignUp();
   const { closeDialog } = useAuthStore();
+  const createOrGetUser = useMutation(api.users.createOrGetUser);
 
   const signInWithEmail = async (email: string, password: string) => {
     if (!isSignInLoaded || !signIn) return { error: 'Sign in not loaded' };
@@ -80,6 +83,15 @@ export function useEmailAuth() {
 
       if (result.status === 'complete') {
         await setSignUpActive({ session: result.createdSessionId });
+
+        if (result.createdUserId) {
+          await createOrGetUser({
+            clerkId: result.createdUserId,
+            email: email,
+            name: email.split('@')[0],
+          });
+        }
+
         closeDialog();
         return { success: true };
       }
