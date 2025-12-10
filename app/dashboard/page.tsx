@@ -1,35 +1,50 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, Bell, Plus } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { LogOut, User, Plus } from 'lucide-react';
 import { TourCard } from '@/components/dashboard/tour-card';
-import { tours as dummy_tours } from '@/data/tours';
 import CreateTourModal from '@/components/dashboard/create-tour';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { Tour } from '@/types/dashboard/tour';
+import { useAuth, useAuthDialogs } from '@/hooks/use-auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function MinimalistDashboard() {
-  const [open, setOpen] = useState(false);
-  const [tours, setTours] = useState(dummy_tours);
+  const router = useRouter();
 
-  const newTour = (data: {
-    tour: {
-      id: number;
-      title: string;
-      description: string;
-      views: number;
-      status: string;
-    };
-  }) => {
-    setTours((prev) => [
-      ...prev,
-      {
-        id: data.tour.id,
-        title: data.tour.title,
-        desc: data.tour.description,
-        views: data.tour.views,
-        status: data.tour.status,
-      },
-    ]);
+  const [open, setOpen] = useState(false);
+
+  const { user, isSignedIn, isLoaded, signOut } = useAuth();
+
+  const trs = useQuery(api.tours.getToursByUser);
+  const [tours, setTours] = useState<Tour[] | undefined>(trs);
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
+
+  const handleLogOut = () => {
+    signOut();
+    router.push('/');
+  };
+
   return (
     <main className="flex-1 p-10">
       <header className="flex items-center justify-between mb-12">
@@ -39,41 +54,86 @@ export default function MinimalistDashboard() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative hidden sm:block">
-            <Search
-              className="absolute left-3 top-2.5 text-gray-400"
-              size={18}
-            />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="pl-10 pr-4 py-2 bg-gray-100 rounded-lg text-sm border border-gray-200 focus:outline-none"
-            />
-          </div>
+          {!isLoaded ? (
+            <div className="h-9 w-24 animate-pulse rounded-md bg-muted" />
+          ) : isSignedIn && user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-9 w-9 rounded-full p-0 hover:bg-accent"
+                >
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage
+                      src={user.imageUrl}
+                      alt={user.fullName || 'User'}
+                    />
+                    <AvatarFallback>
+                      {getInitials(user.fullName)}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
 
-          <button
-            className="relative p-2 rounded-full hover:bg-gray-100 transition"
-            aria-label="notifications"
-          >
-            <Bell size={18} className="text-gray-700" />
-            <span className="w-2 h-2 bg-red-500 rounded-full absolute right-1 top-1"></span>
-          </button>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex items-center gap-3 p-3">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage
+                      src={user.imageUrl}
+                      alt={user.fullName || 'User'}
+                    />
+                    <AvatarFallback>
+                      {getInitials(user.fullName)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{user.fullName}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {user.primaryEmailAddress?.emailAddress}
+                    </span>
+                  </div>
+                </div>
 
-          <div className="w-10 h-10 rounded-full bg-gray-300" />
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem
+                  onClick={() => handleLogOut()}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <></>
+          )}
         </div>
       </header>
 
       <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {tours.map((tour) => (
-          <TourCard
-            id={tour.id}
-            key={tour.id}
-            title={tour.title}
-            desc={tour.desc}
-            views={2847}
-            status={tour.status}
-          />
-        ))}
+        {tours?.length ? (
+          tours.map((tour) => (
+            <TourCard
+              id={tour._id}
+              key={tour._id}
+              title={tour.title}
+              desc={tour.description}
+              status={tour.status}
+            />
+          ))
+        ) : (
+          <></>
+        )}
 
         <button
           className="border-2 border-dashed border-gray-300 p-6 rounded-xl flex flex-col items-center justify-center hover:border-gray-400 transition text-gray-400 hover:text-gray-600"
@@ -84,11 +144,7 @@ export default function MinimalistDashboard() {
         </button>
       </section>
 
-      <CreateTourModal
-        close={() => setOpen(false)}
-        open={open}
-        onSave={newTour}
-      />
+      <CreateTourModal close={() => setOpen(false)} open={open} />
     </main>
   );
 }
